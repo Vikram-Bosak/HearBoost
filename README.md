@@ -1,5 +1,10 @@
 # 🎧 HearBoost — Android Hearing Assistant
 
+[![APK Download](https://img.shields.io/badge/Download-APK-00C9A7?style=for-the-badge&logo=android)](https://github.com/Vikram-Bosak/HearBoost/releases/latest)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/Vikram-Bosak/HearBoost/build.yml?branch=main&style=for-the-badge&label=Build)](https://github.com/Vikram-Bosak/HearBoost/actions)
+
+
+
 > *Hear Every Word, Clearly*
 
 A low-cost Android hearing assistant app that helps elderly and hearing-impaired users hear conversations more clearly using a smartphone and wired/Bluetooth headphones.
