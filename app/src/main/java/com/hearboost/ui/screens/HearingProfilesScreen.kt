@@ -156,7 +156,7 @@ private fun ActiveProfileCard(profile: HearingProfile) {
             ) {
                 Text("${profile.emoji} ${profile.name}", style = HeadlineMedium.copy(fontSize = MaterialTheme.typography.titleLarge.fontSize))
                 Surface(
-                    shape = MaterialTheme.shapes.full,
+                    shape = CircleShape,
                     color = PrimaryContainer
                 ) {
                     Row(

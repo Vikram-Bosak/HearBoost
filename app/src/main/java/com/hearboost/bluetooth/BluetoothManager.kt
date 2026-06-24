@@ -154,11 +154,12 @@ class HeadphoneManager @Inject constructor(
             if (!hasPermission) return "Bluetooth Device"
         }
 
-        val a2dp = bluetoothAdapter?.getProfileProxy(context, null, BluetoothProfile.A2DP)
-        Thread.sleep(100) // Brief wait for profile connection
-        @Suppress("DEPRECATION")
-        val devices = bluetoothAdapter?.getConnectedDevices(BluetoothProfile.A2DP)
-        return devices?.firstOrNull()?.name ?: "Bluetooth Device"
+        val a2dp = bluetoothAdapter?.getProfileProxy(context, object : BluetoothProfile.ServiceListener {
+            override fun onServiceConnected(p0: Int, p1: BluetoothProfile) {}
+            override fun onServiceDisconnected(p0: Int) {}
+        }, BluetoothProfile.A2DP)
+        Thread.sleep(100)
+        return bluetoothAdapter?.name ?: "Bluetooth Device"
     }
 
     fun getLatencyInfo(): String {
