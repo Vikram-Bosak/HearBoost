@@ -5,9 +5,15 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     
     steps:
     - name: Checkout code
@@ -27,8 +33,7 @@ jobs:
       run: chmod +x gradlew || true
 
     - name: Generate Gradle Wrapper
-      run: |
-        gradle wrapper --gradle-version 8.5
+      run: gradle wrapper --gradle-version 8.5
 
     - name: Build Debug APK
       run: ./gradlew assembleDebug --no-daemon
@@ -57,33 +62,17 @@ jobs:
         tag_name: v1.0.0
         name: "HearBoost v1.0.0"
         body: |
-          ## 🎧 HearBoost v1.0.0
-          
-          **Android Hearing Assistant — Hear Every Word, Clearly**
-          
-          ### What's Included
-          - ✅ One-Tap Start Listening
-          - ✅ Real-time Mic → DSP → Headphones pipeline
-          - ✅ Volume Amplification (up to 20x)
-          - ✅ 3-Level Noise Reduction
-          - ✅ Wired + Bluetooth headphone support
-          - ✅ Foreground Service (background audio)
-          - ✅ Senior-Friendly Deep Ocean UI
-          - ✅ WHO hearing safety limits
-          
+          ## HearBoost v1.0.0 - Android Hearing Assistant
           ### How to Install
           1. Download the APK below
-          2. Enable "Install from Unknown Sources" on your Android phone
-          3. Open the APK file to install
-          4. Grant Microphone permission when asked
-          5. Plug in headphones and tap "Start Listening"!
+          2. Enable Install from Unknown Sources
+          3. Open APK to install
+          4. Grant Microphone permission
+          5. Plug in headphones and tap Start Listening
           
           ### Requirements
-          - Android 8.0 (API 26) or higher
-          - Wired headphones OR Bluetooth headphones recommended
-          
-          ### ⚠️ Legal
-          This is a Sound Amplifier, NOT a medical hearing aid.
+          - Android 8.0+ (API 26)
+          - Wired or Bluetooth headphones
         files: apk-output/*.apk
         draft: false
         prerelease: false
