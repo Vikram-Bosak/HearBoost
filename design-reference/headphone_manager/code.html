@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HearBoost — Device Manager</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&amp;family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        
+        body {
+            background-color: #0a1422; /* surface-dim from config / #07111F vibe */
+            color: #d9e3f7; /* on-background */
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .card-shadow {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .active-ring {
+            box-shadow: inset 0 0 0 2px #00c9a7;
+        }
+
+        /* Custom scrollbar for clean UI */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a1422;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #16202f;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-background": "#d9e3f7",
+                      "primary-fixed": "#5ffbd6",
+                      "inverse-on-surface": "#273140",
+                      "on-error-container": "#ffdad6",
+                      "on-tertiary": "#003918",
+                      "tertiary": "#57e886",
+                      "outline": "#85948e",
+                      "primary-container": "#00c9a7",
+                      "tertiary-fixed": "#6ffe99",
+                      "tertiary-fixed-dim": "#4fe080",
+                      "surface-container-high": "#212a39",
+                      "error-container": "#93000a",
+                      "surface-tint": "#38debb",
+                      "on-tertiary-fixed-variant": "#005226",
+                      "inverse-surface": "#d9e3f7",
+                      "on-primary-container": "#004e40",
+                      "surface-container-lowest": "#050e1c",
+                      "surface-container-low": "#121c2a",
+                      "on-secondary": "#452b00",
+                      "on-secondary-container": "#4f3100",
+                      "surface": "#0a1422",
+                      "outline-variant": "#3c4a45",
+                      "on-primary-fixed": "#002019",
+                      "on-tertiary-container": "#005024",
+                      "background": "#0a1422",
+                      "primary": "#44e5c2",
+                      "on-secondary-fixed": "#291800",
+                      "on-secondary-fixed-variant": "#633f00",
+                      "tertiary-container": "#34cb6d",
+                      "on-primary-fixed-variant": "#005142",
+                      "inverse-primary": "#006b58",
+                      "on-surface": "#d9e3f7",
+                      "on-surface-variant": "#bacac3",
+                      "surface-dim": "#0a1422",
+                      "surface-variant": "#2c3545",
+                      "surface-container-highest": "#2c3545",
+                      "surface-bright": "#303a49",
+                      "secondary-container": "#dc9100",
+                      "on-primary": "#00382d",
+                      "secondary-fixed": "#ffddb4",
+                      "secondary-fixed-dim": "#ffb955",
+                      "surface-container": "#16202f",
+                      "on-error": "#690005",
+                      "primary-fixed-dim": "#38debb",
+                      "secondary": "#ffb955",
+                      "error": "#ffb4ab",
+                      "on-tertiary-fixed": "#00210b"
+              },
+              "borderRadius": {
+                      "DEFAULT": "1rem",
+                      "lg": "2rem",
+                      "xl": "3rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "base": "8px",
+                      "xs": "4px",
+                      "margin-mobile": "24px",
+                      "gutter": "16px",
+                      "touch-target": "56px",
+                      "sm": "12px",
+                      "md": "24px",
+                      "lg": "40px"
+              },
+              "fontFamily": {
+                      "headline-lg": ["Poppins"],
+                      "button": ["Poppins"],
+                      "body-md": ["Roboto"],
+                      "headline-md": ["Poppins"],
+                      "display-lg": ["Poppins"],
+                      "body-lg": ["Roboto"],
+                      "label-lg": ["Roboto"]
+              },
+              "fontSize": {
+                      "headline-lg": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "button": ["18px", {"lineHeight": "24px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                      "body-md": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-lg": ["20px", {"lineHeight": "30px", "fontWeight": "400"}],
+                      "label-lg": ["16px", {"lineHeight": "24px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                      "label-lg-mobile": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}]
+              }
+            },
+          },
+        }
+      </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="font-body-md text-body-md pb-32">
+<!-- Top AppBar (from JSON - Semantic Shell) -->
+<header class="sticky top-0 z-50 bg-surface-container-low dark:bg-surface-container-low flex justify-between items-center w-full px-margin-mobile h-touch-target">
+<div class="flex items-center gap-4">
+<button class="active:scale-95 transition-transform duration-150 p-2 -ml-2 rounded-full hover:bg-surface-variant">
+<span class="material-symbols-outlined text-primary dark:text-primary">arrow_back</span>
+</button>
+<h1 class="text-headline-lg-mobile font-headline-lg-mobile font-bold text-primary dark:text-primary">Headphones</h1>
+</div>
+<button class="active:scale-95 transition-transform duration-150 p-2 rounded-full hover:bg-surface-variant">
+<span class="material-symbols-outlined text-primary dark:text-primary">settings</span>
+</button>
+</header>
+<main class="px-margin-mobile pt-md space-y-lg">
+<!-- Output Type Section -->
+<section class="space-y-sm">
+<h2 class="font-label-lg text-label-lg uppercase tracking-widest text-on-surface-variant opacity-80">Output Type</h2>
+<div class="grid gap-gutter">
+<!-- Wired Option -->
+<div class="group cursor-pointer active:scale-[0.98] transition-all duration-200 bg-surface-container-high rounded-lg p-md flex items-center gap-md border border-transparent hover:border-primary-container">
+<div class="w-14 h-14 rounded-full bg-surface-container flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-[32px]">settings_input_component</span>
+</div>
+<div class="flex-1">
+<p class="font-headline-md text-on-surface">Wired Earphones</p>
+<p class="font-body-md text-on-surface-variant">Plug in 3.5mm jack</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary">chevron_right</span>
+</div>
+<!-- Bluetooth Option -->
+<div class="group cursor-pointer active:scale-[0.98] transition-all duration-200 bg-surface-container-high rounded-lg p-md flex items-center gap-md border border-transparent hover:border-primary-container">
+<div class="w-14 h-14 rounded-full bg-surface-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[32px]">bluetooth</span>
+</div>
+<div class="flex-1">
+<p class="font-headline-md text-on-surface">Bluetooth</p>
+<p class="font-body-md text-on-surface-variant">Tap to pair device</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary">chevron_right</span>
+</div>
+</div>
+</section>
+<!-- Saved Devices Section -->
+<section class="space-y-sm">
+<div class="flex justify-between items-end">
+<h2 class="font-label-lg text-label-lg uppercase tracking-widest text-on-surface-variant opacity-80">Saved Devices</h2>
+</div>
+<div class="space-y-gutter">
+<!-- Connected Device Card -->
+<div class="relative overflow-hidden active:scale-[0.99] transition-all duration-200 bg-surface-container-highest rounded-lg p-md flex items-center gap-md border-l-[4px] border-primary-container active-ring">
+<div class="w-14 h-14 rounded-full bg-primary-container/10 flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">headphones</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-xs">
+<p class="font-headline-md text-on-surface">Sony WH-1000XM5</p>
+<span class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span>
+</div>
+<div class="flex items-center gap-sm mt-xs">
+<span class="font-label-lg text-primary-container font-bold">Connected</span>
+<span class="text-on-surface-variant">•</span>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-label-lg">battery_horiz_075</span>
+<span class="font-label-lg">87%</span>
+</div>
+</div>
+</div>
+<button class="w-12 h-12 rounded-full flex items-center justify-center hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">more_vert</span>
+</button>
+</div>
+<!-- Inactive Device Card -->
+<div class="active:scale-[0.99] transition-all duration-200 bg-surface-container-low rounded-lg p-md flex items-center gap-md border-l-[4px] border-[#1E3D5C]">
+<div class="w-14 h-14 rounded-full bg-surface-variant flex items-center justify-center text-outline">
+<span class="material-symbols-outlined text-[32px]">headphones</span>
+</div>
+<div class="flex-1">
+<p class="font-headline-md text-on-surface opacity-60">Boat Rockerz 450</p>
+<p class="font-body-md text-on-surface-variant">Last used: 2 days</p>
+</div>
+<button class="w-12 h-12 rounded-full flex items-center justify-center hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">more_vert</span>
+</button>
+</div>
+</div>
+</section>
+<!-- CTA Action -->
+<div class="pt-md">
+<button class="w-full h-touch-target bg-primary-container text-on-primary-container rounded-full font-button text-button flex items-center justify-center gap-sm active:scale-95 transition-transform duration-150 shadow-lg">
+<span class="material-symbols-outlined">add</span>
+                Pair New Device
+            </button>
+</div>
+<!-- Atmospheric Visual Layer (Minimalist for silver gen focus) -->
+<div class="opacity-10 pointer-events-none fixed bottom-20 left-0 right-0 h-32">
+
+</div>
+</main>
+<!-- Bottom Navigation Bar (from JSON) -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 py-3 bg-surface-container dark:bg-surface-container border-t border-outline-variant rounded-t-lg">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-6 py-2 transition-transform duration-150 active:scale-95" href="#">
+<span class="material-symbols-outlined">graphic_eq</span>
+<span class="font-label-lg-mobile text-label-lg-mobile">Listen</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary-container text-on-primary-container dark:text-on-primary-container rounded-xl px-6 py-2 transition-transform duration-150 active:scale-95" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+<span class="font-label-lg-mobile text-label-lg-mobile">Profiles</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-6 py-2 transition-transform duration-150 active:scale-95" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-lg-mobile text-label-lg-mobile">History</span>
+</a>
+</nav>
+<script>
+        // Simple touch interaction handler
+        document.querySelectorAll('.active\\:scale-\\[0\\.98\\]').forEach(card => {
+            card.addEventListener('touchstart', () => card.classList.add('scale-[0.98]'));
+            card.addEventListener('touchend', () => card.classList.remove('scale-[0.98]'));
+        });
+    </script>
+</body></html>

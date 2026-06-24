@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Audio Settings - HearBoost</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Roboto:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-background": "#d9e3f7",
+                        "primary-fixed": "#5ffbd6",
+                        "inverse-on-surface": "#273140",
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary": "#003918",
+                        "tertiary": "#57e886",
+                        "outline": "#85948e",
+                        "primary-container": "#00c9a7",
+                        "tertiary-fixed": "#6ffe99",
+                        "tertiary-fixed-dim": "#4fe080",
+                        "surface-container-high": "#212a39",
+                        "error-container": "#93000a",
+                        "surface-tint": "#38debb",
+                        "on-tertiary-fixed-variant": "#005226",
+                        "inverse-surface": "#d9e3f7",
+                        "on-primary-container": "#004e40",
+                        "surface-container-lowest": "#050e1c",
+                        "surface-container-low": "#121c2a",
+                        "on-secondary": "#452b00",
+                        "on-secondary-container": "#4f3100",
+                        "surface": "#0a1422",
+                        "outline-variant": "#3c4a45",
+                        "on-primary-fixed": "#002019",
+                        "on-tertiary-container": "#005024",
+                        "background": "#0a1422",
+                        "primary": "#44e5c2",
+                        "on-secondary-fixed": "#291800",
+                        "on-secondary-fixed-variant": "#633f00",
+                        "tertiary-container": "#34cb6d",
+                        "on-primary-fixed-variant": "#005142",
+                        "inverse-primary": "#006b58",
+                        "on-surface": "#d9e3f7",
+                        "on-surface-variant": "#bacac3",
+                        "surface-dim": "#0a1422",
+                        "surface-variant": "#2c3545",
+                        "surface-container-highest": "#2c3545",
+                        "surface-bright": "#303a49",
+                        "secondary-container": "#dc9100",
+                        "on-primary": "#00382d",
+                        "secondary-fixed": "#ffddb4",
+                        "secondary-fixed-dim": "#ffb955",
+                        "surface-container": "#16202f",
+                        "on-error": "#690005",
+                        "primary-fixed-dim": "#38debb",
+                        "secondary": "#ffb955",
+                        "error": "#ffb4ab",
+                        "on-tertiary-fixed": "#00210b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "xs": "4px",
+                        "margin-mobile": "24px",
+                        "gutter": "16px",
+                        "touch-target": "56px",
+                        "sm": "12px",
+                        "md": "24px",
+                        "lg": "40px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Poppins"],
+                        "button": ["Poppins"],
+                        "body-md": ["Roboto"],
+                        "headline-md": ["Poppins"],
+                        "display-lg": ["Poppins"],
+                        "body-lg": ["Roboto"],
+                        "label-lg": ["Roboto"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                        "button": ["18px", {"lineHeight": "24px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                        "body-md": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["20px", {"lineHeight": "30px", "fontWeight": "400"}],
+                        "label-lg": ["16px", {"lineHeight": "24px", "letterSpacing": "0.01em", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #07111F;
+            color: #d9e3f7;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .custom-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 40px;
+            height: 40px;
+            background: #F5A623;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 4px solid #1A3352;
+            box-shadow: 0 0 15px rgba(245, 166, 35, 0.4);
+        }
+        .custom-slider::-moz-range-thumb {
+            width: 40px;
+            height: 40px;
+            background: #F5A623;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 4px solid #1A3352;
+            box-shadow: 0 0 15px rgba(245, 166, 35, 0.4);
+        }
+        .dotted-divider {
+            background-image: radial-gradient(circle, #1A3352 1px, transparent 1px);
+            background-size: 8px 1px;
+            height: 1px;
+            width: 100%;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="flex flex-col min-h-screen">
+<!-- Top App Bar -->
+<header class="flex justify-between items-center w-full px-margin-mobile h-touch-target sticky top-0 z-50 bg-surface/90 backdrop-blur-md">
+<div class="flex items-center gap-4">
+<button class="active:scale-95 transition-transform duration-150 p-2 hover:bg-surface-variant rounded-full">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">Audio Settings</h1>
+</div>
+<button class="active:scale-95 transition-transform duration-150 p-2 hover:bg-surface-variant rounded-full">
+<span class="material-symbols-outlined text-primary">settings</span>
+</button>
+</header>
+<main class="flex-1 px-margin-mobile pt-md pb-lg space-y-lg">
+<!-- Main Volume Section -->
+<section class="space-y-sm">
+<div class="flex justify-between items-center">
+<span class="font-label-lg-mobile text-label-lg-mobile text-on-surface-variant">Main Volume</span>
+<span class="font-headline-md text-headline-md text-primary-fixed">75%</span>
+</div>
+<div class="relative flex items-center h-touch-target">
+<input class="w-full h-3 bg-surface-container-high rounded-full appearance-none custom-slider accent-primary-container outline-none" max="100" min="0" type="range" value="75"/>
+</div>
+</section>
+<div class="dotted-divider"></div>
+<!-- Sound Enhancement Section -->
+<section class="space-y-md">
+<h2 class="font-label-lg text-label-lg uppercase tracking-widest text-[#7A9AB5]">Sound Enhancement</h2>
+<!-- Bass Boost -->
+<div class="bg-surface-container-low p-md rounded-lg space-y-sm border border-outline-variant/30">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary">equalizer</span>
+<span class="font-body-lg text-body-lg">Bass Boost</span>
+</div>
+<span class="font-label-lg text-tertiary">Level 4</span>
+</div>
+<input class="w-full h-2 bg-surface-container-highest rounded-full appearance-none accent-tertiary outline-none cursor-pointer" max="10" min="0" type="range" value="4"/>
+</div>
+<!-- Clarity Boost -->
+<div class="bg-surface-container-low p-md rounded-lg space-y-sm border border-outline-variant/30">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">hearing</span>
+<span class="font-body-lg text-body-lg">Clarity Boost</span>
+</div>
+<span class="font-label-lg text-primary">Level 8</span>
+</div>
+<input class="w-full h-2 bg-surface-container-highest rounded-full appearance-none accent-primary outline-none cursor-pointer" max="10" min="0" type="range" value="8"/>
+</div>
+</section>
+<div class="dotted-divider"></div>
+<!-- Noise Reduction Section -->
+<section class="space-y-sm">
+<h2 class="font-label-lg text-label-lg uppercase tracking-widest text-[#7A9AB5]">Noise Reduction</h2>
+<div class="flex bg-surface-container-low p-1 rounded-xl h-touch-target items-stretch border border-outline-variant/30">
+<button class="flex-1 flex items-center justify-center rounded-lg font-button text-on-surface-variant hover:bg-surface-variant transition-colors">Off</button>
+<button class="flex-1 flex items-center justify-center rounded-lg font-button bg-primary-container text-on-primary-container shadow-lg">Low</button>
+<button class="flex-1 flex items-center justify-center rounded-lg font-button text-on-surface-variant hover:bg-surface-variant transition-colors">High</button>
+</div>
+</section>
+<!-- Latency Mode Section -->
+<section class="space-y-sm">
+<h2 class="font-label-lg text-label-lg uppercase tracking-widest text-[#7A9AB5]">Latency Mode</h2>
+<div class="flex bg-surface-container-low p-1 rounded-xl h-touch-target items-stretch border border-outline-variant/30">
+<button class="flex-1 flex items-center justify-center rounded-lg font-button bg-primary-container text-on-primary-container shadow-lg">Low Delay</button>
+<button class="flex-1 flex items-center justify-center rounded-lg font-button text-on-surface-variant hover:bg-surface-variant transition-colors">High Quality</button>
+</div>
+<p class="font-label-lg text-label-lg text-on-surface-variant opacity-70 italic px-2">
+                Wired: ~15ms, Bluetooth: ~200ms
+            </p>
+</section>
+<!-- CTA Action -->
+<section class="pt-lg flex flex-col items-center">
+<button class="w-full h-touch-target border-2 border-outline rounded-full font-button text-on-surface active:bg-surface-variant transition-all hover:border-primary">
+                Reset to Defaults
+            </button>
+</section>
+</main>
+<!-- Bottom Navigation Spacer for Fixed Shell -->
+<div class="h-24"></div>
+<!-- Bottom NavBar -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 py-3 bg-surface-container rounded-t-lg border-t border-outline-variant shadow-xl">
+<div class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-6 py-2 scale-95 transition-transform duration-150 cursor-pointer">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">graphic_eq</span>
+<span class="font-label-lg-mobile text-label-lg-mobile">Listen</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-6 py-2 hover:bg-surface-variant rounded-xl cursor-pointer">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="font-label-lg-mobile text-label-lg-mobile">Profiles</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-6 py-2 hover:bg-surface-variant rounded-xl cursor-pointer">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-lg-mobile text-label-lg-mobile">History</span>
+</div>
+</nav>
+<script>
+        // Simple micro-interaction for segment toggles
+        document.querySelectorAll('.flex.bg-surface-container-low button').forEach(button => {
+            button.addEventListener('click', function() {
+                // Find all siblings and reset classes
+                const siblings = Array.from(this.parentElement.children);
+                siblings.forEach(sib => {
+                    sib.classList.remove('bg-primary-container', 'text-on-primary-container', 'shadow-lg');
+                    sib.classList.add('text-on-surface-variant');
+                });
+                // Set active class to this button
+                this.classList.remove('text-on-surface-variant');
+                this.classList.add('bg-primary-container', 'text-on-primary-container', 'shadow-lg');
+            });
+        });
+    </script>
+</body></html>

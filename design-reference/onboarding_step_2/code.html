@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HearBoost - Connect Your Headphones</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100..900&family=Roboto:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-background": "#d9e3f7",
+                    "primary-fixed": "#5ffbd6",
+                    "inverse-on-surface": "#273140",
+                    "on-error-container": "#ffdad6",
+                    "on-tertiary": "#003918",
+                    "tertiary": "#57e886",
+                    "outline": "#85948e",
+                    "primary-container": "#00c9a7",
+                    "tertiary-fixed": "#6ffe99",
+                    "tertiary-fixed-dim": "#4fe080",
+                    "surface-container-high": "#212a39",
+                    "error-container": "#93000a",
+                    "surface-tint": "#38debb",
+                    "on-tertiary-fixed-variant": "#005226",
+                    "inverse-surface": "#d9e3f7",
+                    "on-primary-container": "#004e40",
+                    "surface-container-lowest": "#050e1c",
+                    "surface-container-low": "#121c2a",
+                    "on-secondary": "#452b00",
+                    "on-secondary-container": "#4f3100",
+                    "surface": "#0a1422",
+                    "outline-variant": "#3c4a45",
+                    "on-primary-fixed": "#002019",
+                    "on-tertiary-container": "#005024",
+                    "background": "#0a1422",
+                    "primary": "#44e5c2",
+                    "on-secondary-fixed": "#291800",
+                    "on-secondary-fixed-variant": "#633f00",
+                    "tertiary-container": "#34cb6d",
+                    "on-primary-fixed-variant": "#005142",
+                    "inverse-primary": "#006b58",
+                    "on-surface": "#d9e3f7",
+                    "on-surface-variant": "#bacac3",
+                    "surface-dim": "#0a1422",
+                    "surface-variant": "#2c3545",
+                    "surface-container-highest": "#2c3545",
+                    "surface-bright": "#303a49",
+                    "secondary-container": "#dc9100",
+                    "on-primary": "#00382d",
+                    "secondary-fixed": "#ffddb4",
+                    "secondary-fixed-dim": "#ffb955",
+                    "surface-container": "#16202f",
+                    "on-error": "#690005",
+                    "primary-fixed-dim": "#38debb",
+                    "secondary": "#ffb955",
+                    "error": "#ffb4ab",
+                    "on-tertiary-fixed": "#00210b"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "base": "8px",
+                    "xs": "4px",
+                    "margin-mobile": "24px",
+                    "gutter": "16px",
+                    "touch-target": "56px",
+                    "sm": "12px",
+                    "md": "24px",
+                    "lg": "40px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Poppins"],
+                    "button": ["Poppins"],
+                    "body-md": ["Roboto"],
+                    "headline-md": ["Poppins"],
+                    "display-lg": ["Poppins"],
+                    "body-lg": ["Roboto"],
+                    "label-lg": ["Roboto"]
+            },
+            "fontSize": {
+                    "headline-lg": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "button": ["18px", {"lineHeight": "24px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "body-md": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["20px", {"lineHeight": "30px", "fontWeight": "400"}],
+                    "label-lg": ["16px", {"lineHeight": "24px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "label-lg-mobile": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #07111F;
+            color: #d9e3f7;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .step-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 9999px;
+            background-color: #3c4a45;
+            transition: all 0.3s ease;
+        }
+        .step-dot.active {
+            width: 24px;
+            background-color: #00c9a7;
+        }
+        .audio-wave-pulse {
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 0.4; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="flex flex-col min-h-screen">
+<!-- Top Navigation (Shell suppressed for Onboarding) -->
+<header class="w-full px-margin-mobile h-touch-target flex items-center justify-center">
+<div class="flex items-center gap-2">
+<div class="step-dot"></div>
+<div class="step-dot active"></div>
+<div class="step-dot"></div>
+</div>
+</header>
+<main class="flex-grow flex flex-col items-center px-margin-mobile pt-lg pb-lg max-w-md mx-auto text-center">
+<!-- Hero Illustration Area -->
+<div class="relative w-full aspect-square max-w-[280px] mb-lg flex items-center justify-center">
+<!-- Decorative Background Glow -->
+<div class="absolute inset-0 bg-primary-container opacity-10 blur-3xl rounded-full audio-wave-pulse"></div>
+<!-- Icon Cluster -->
+<div class="relative z-10 flex items-center gap-gutter">
+<div class="bg-surface-container-high p-8 rounded-lg border-2 border-outline-variant flex flex-col items-center gap-4 shadow-xl">
+<span class="material-symbols-outlined text-[64px] text-primary" style="font-variation-settings: 'opsz' 48;">headphones</span>
+<span class="font-label-lg text-label-lg text-on-surface-variant">Wired</span>
+</div>
+<div class="bg-surface-container-high p-8 rounded-lg border-2 border-primary-container flex flex-col items-center gap-4 shadow-xl">
+<span class="material-symbols-outlined text-[64px] text-primary" style="font-variation-settings: 'opsz' 48, 'FILL' 1;">bluetooth_audio</span>
+<span class="font-label-lg text-label-lg text-primary">Wireless</span>
+</div>
+</div>
+</div>
+<!-- Text Content -->
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-sm">
+            Connect Your Headphones
+        </h1>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg">
+            Works with: Any wired earphones, Bluetooth headphones, Hearing loop devices. Plug in or pair your headphones now.
+        </p>
+<!-- Connectivity Badge (Optional Detail for Silver Gen clarity) -->
+<div class="w-full bg-surface-container-low border border-outline-variant p-md rounded-lg mb-lg flex items-center gap-md text-left">
+<div class="bg-primary-container/20 p-sm rounded-full">
+<span class="material-symbols-outlined text-primary">hearing</span>
+</div>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Universal Compatibility</p>
+<p class="text-[14px] text-on-surface-variant">Optimized for standard audio output.</p>
+</div>
+</div>
+</main>
+<!-- Fixed Action Bar -->
+<footer class="w-full px-margin-mobile pb-lg mt-auto max-w-md mx-auto">
+<div class="flex flex-col gap-md">
+<button class="w-full h-touch-target bg-primary-container text-on-primary-container font-button text-button rounded-full active:scale-95 transition-transform duration-150 shadow-lg">
+                Continue
+            </button>
+<button class="w-full py-4 text-primary-fixed font-button text-button hover:underline focus:outline-none">
+                Already done
+            </button>
+</div>
+</footer>
+<!-- Micro-interaction Script -->
+<script>
+        document.querySelector('button.bg-primary-container').addEventListener('click', () => {
+            // Mock transition to next screen
+            console.log("Navigating to step 3...");
+        });
+
+        document.querySelector('button.text-primary-fixed').addEventListener('click', () => {
+            // Mock skip
+            console.log("Skipping to dashboard...");
+        });
+    </script>
+</body></html>

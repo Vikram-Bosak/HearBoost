@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HearBoost — Hearing Profiles</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;family=Roboto:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #0a1422;
+            color: #d9e3f7;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .active-border-teal {
+            box-shadow: inset 6px 0 0 0 #00c9a7;
+        }
+        .custom-scroll-hide::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-background": "#d9e3f7",
+                        "primary-fixed": "#5ffbd6",
+                        "inverse-on-surface": "#273140",
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary": "#003918",
+                        "tertiary": "#57e886",
+                        "outline": "#85948e",
+                        "primary-container": "#00c9a7",
+                        "tertiary-fixed": "#6ffe99",
+                        "tertiary-fixed-dim": "#4fe080",
+                        "surface-container-high": "#212a39",
+                        "error-container": "#93000a",
+                        "surface-tint": "#38debb",
+                        "on-tertiary-fixed-variant": "#005226",
+                        "inverse-surface": "#d9e3f7",
+                        "on-primary-container": "#004e40",
+                        "surface-container-lowest": "#050e1c",
+                        "surface-container-low": "#121c2a",
+                        "on-secondary": "#452b00",
+                        "on-secondary-container": "#4f3100",
+                        "surface": "#0a1422",
+                        "outline-variant": "#3c4a45",
+                        "on-primary-fixed": "#002019",
+                        "on-tertiary-container": "#005024",
+                        "background": "#0a1422",
+                        "primary": "#44e5c2",
+                        "on-secondary-fixed": "#291800",
+                        "on-secondary-fixed-variant": "#633f00",
+                        "tertiary-container": "#34cb6d",
+                        "on-primary-fixed-variant": "#005142",
+                        "inverse-primary": "#006b58",
+                        "on-surface": "#d9e3f7",
+                        "on-surface-variant": "#bacac3",
+                        "surface-dim": "#0a1422",
+                        "surface-variant": "#2c3545",
+                        "surface-container-highest": "#2c3545",
+                        "surface-bright": "#303a49",
+                        "secondary-container": "#dc9100",
+                        "on-primary": "#00382d",
+                        "secondary-fixed": "#ffddb4",
+                        "secondary-fixed-dim": "#ffb955",
+                        "surface-container": "#16202f",
+                        "on-error": "#690005",
+                        "primary-fixed-dim": "#38debb",
+                        "secondary": "#ffb955",
+                        "error": "#ffb4ab",
+                        "on-tertiary-fixed": "#00210b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "xs": "4px",
+                        "margin-mobile": "24px",
+                        "gutter": "16px",
+                        "touch-target": "56px",
+                        "sm": "12px",
+                        "md": "24px",
+                        "lg": "40px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Poppins"],
+                        "button": ["Poppins"],
+                        "body-md": ["Roboto"],
+                        "headline-md": ["Poppins"],
+                        "display-lg": ["Poppins"],
+                        "body-lg": ["Roboto"],
+                        "label-lg": ["Roboto"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                        "button": ["18px", {"lineHeight": "24px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                        "body-md": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["20px", {"lineHeight": "30px", "fontWeight": "400"}],
+                        "label-lg": ["16px", {"lineHeight": "24px", "letterSpacing": "0.01em", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen">
+<!-- Top AppBar (Back arrow + Title) -->
+<header class="sticky top-0 z-50 bg-surface h-touch-target flex items-center px-margin-mobile">
+<button class="w-10 h-10 flex items-center justify-start text-primary active:scale-95 transition-transform">
+<span class="material-symbols-outlined" style="font-size: 32px;">arrow_back</span>
+</button>
+<h1 class="ml-4 font-headline-lg-mobile text-headline-lg-mobile text-primary font-bold">Hearing Profiles</h1>
+<div class="ml-auto">
+<span class="material-symbols-outlined text-primary-fixed">battery_charging_80</span>
+</div>
+</header>
+<main class="flex-grow px-margin-mobile pb-32">
+<!-- Visual Atmosphere Shader -->
+<div class="relative w-full h-48 mb-8 rounded-lg overflow-hidden mt-4">
+
+<div class="relative z-10 p-6 flex flex-col justify-end h-full">
+<span class="font-label-lg-mobile text-on-surface-variant uppercase tracking-widest mb-1">Current Focus</span>
+<h2 class="font-display-lg text-primary">Optimization Active</h2>
+</div>
+</div>
+<!-- Section Label -->
+<div class="mb-4">
+<h3 class="font-label-lg-mobile text-on-surface-variant font-bold uppercase tracking-wider">Quick Presets</h3>
+</div>
+<!-- Active Profile Card -->
+<section class="mb-8">
+<div class="bg-surface-container-high rounded-lg p-6 active-border-teal flex flex-col gap-3 relative overflow-hidden active:scale-[0.98] transition-transform cursor-pointer">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-2">
+<span class="font-headline-md text-on-surface">👴 Dad's Settings</span>
+</div>
+<div class="bg-primary-container px-3 py-1 rounded-full flex items-center gap-2">
+<span class="w-2 h-2 bg-on-primary-container rounded-full animate-pulse"></span>
+<span class="font-label-lg-mobile text-on-primary-container font-bold">Active</span>
+</div>
+</div>
+<div class="flex items-center gap-4 mt-2">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-primary">volume_up</span>
+<span class="font-body-md">Vol 80%</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-primary">blur_on</span>
+<span class="font-body-md">Noise: Hi</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Preset List -->
+<div class="space-y-4">
+<!-- Preset Card 1 -->
+<div class="bg-surface-container-low p-6 rounded-lg border border-outline-variant flex items-center gap-4 active:bg-surface-container-high transition-colors">
+<div class="w-14 h-14 bg-surface-container-highest rounded-full flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" style="font-size: 32px;">record_voice_over</span>
+</div>
+<div class="flex-grow">
+<p class="font-headline-md text-on-surface text-[20px]">🎯 Conversation</p>
+<p class="font-body-md text-on-surface-variant">Optimized for voice clarity</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</div>
+<!-- Preset Card 2 -->
+<div class="bg-surface-container-low p-6 rounded-lg border border-outline-variant flex items-center gap-4 active:bg-surface-container-high transition-colors">
+<div class="w-14 h-14 bg-surface-container-highest rounded-full flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" style="font-size: 32px;">tv</span>
+</div>
+<div class="flex-grow">
+<p class="font-headline-md text-on-surface text-[20px]">📺 TV Watching</p>
+<p class="font-body-md text-on-surface-variant">Boosted mid-range frequencies</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</div>
+<!-- Preset Card 3 -->
+<div class="bg-surface-container-low p-6 rounded-lg border border-outline-variant flex items-center gap-4 active:bg-surface-container-high transition-colors">
+<div class="w-14 h-14 bg-surface-container-highest rounded-full flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" style="font-size: 32px;">park</span>
+</div>
+<div class="flex-grow">
+<p class="font-headline-md text-on-surface text-[20px]">🌳 Outdoors</p>
+<p class="font-body-md text-on-surface-variant">Wind noise reduced significantly</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</div>
+</div>
+<!-- Create Profile CTA -->
+<button class="mt-8 w-full h-touch-target bg-surface-container-high border-2 border-dashed border-outline-variant rounded-lg flex items-center justify-center gap-3 active:scale-[0.98] transition-transform">
+<span class="material-symbols-outlined text-primary">add_circle</span>
+<span class="font-button text-on-surface">Create Custom Profile</span>
+</button>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface-container border-t border-outline-variant flex justify-around items-center px-4 py-3 md:hidden">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-6 py-2 active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">graphic_eq</span>
+<span class="font-label-lg-mobile text-label-lg-mobile mt-1">Listen</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-6 py-2 active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+<span class="font-label-lg-mobile text-label-lg-mobile mt-1">Profiles</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-6 py-2 active:scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-lg-mobile text-label-lg-mobile mt-1">History</span>
+</a>
+</nav>
+<script>
+        // Micro-interactions for profile selection
+        document.querySelectorAll('.space-y-4 > div').forEach(card => {
+            card.addEventListener('click', () => {
+                // Simulate selection feedback
+                card.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    card.style.transform = 'scale(1)';
+                }, 100);
+            });
+        });
+    </script>
+</body></html>
