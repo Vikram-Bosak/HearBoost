@@ -1,4 +1,4 @@
-name: Build APK & Create Release
+name: Build & Sign APK
 
 on:
   push:
@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: write
-  packages: write
 
 jobs:
   build:
@@ -29,11 +28,10 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew || true
-
     - name: Generate Gradle Wrapper
-      run: gradle wrapper --gradle-version 8.5
+      run: |
+        chmod +x gradlew 2>/dev/null || true
+        gradle wrapper --gradle-version 8.5
 
     - name: Build Debug APK
       run: ./gradlew assembleDebug --no-daemon
@@ -44,36 +42,87 @@ jobs:
 
     - name: Find APK files
       run: |
-        echo "=== APK Files ==="
-        find . -name "*.apk" -type f
         mkdir -p apk-output
         find . -name "*.apk" -type f -exec cp {} apk-output/ \;
+        ls -la apk-output/
 
-    - name: Upload APK Artifact
+    - name: Sign APK
+      run: |
+        # Create keystore
+        keytool -genkeypair -v \
+          -keystore release.keystore \
+          -alias hearboost \
+          -keyalg RSA -keysize 2048 \
+          -validity 10000 \
+          -storepass hearboost123 \
+          -keypass hearboost123 \
+          -dname "CN=HearBoost, OU=Dev, O=HearBoost, L=India, ST=Bihar, C=IN"
+
+        # Find apksigner
+        APKSIGNER=$(find $ANDROID_HOME -name "apksigner" -type f | head -1)
+        ZIPALIGN=$(find $ANDROID_HOME -name "zipalign" -type f | head -1)
+
+        # Sign each APK
+        for apk in apk-output/*.apk; do
+          echo "Signing $apk..."
+          BASENAME=$(basename "$apk" .apk)
+          
+          # Zipalign
+          ${ZIPALIGN} -v -p 4 "$apk" "apk-output/${BASENAME}-aligned.apk" 2>/dev/null || cp "$apk" "apk-output/${BASENAME}-aligned.apk"
+          
+          # Sign
+          ${APKSIGNER} sign \
+            --ks release.keystore \
+            --ks-pass pass:hearboost123 \
+            --key-pass pass:hearboost123 \
+            --ks-key-alias hearboost \
+            --out "apk-output/${BASENAME}-signed.apk" \
+            "apk-output/${BASENAME}-aligned.apk"
+          
+          # Verify
+          ${APKSIGNER} verify --verbose "apk-output/${BASENAME}-signed.apk"
+          echo "Done: ${BASENAME}-signed.apk"
+        done
+
+        # Clean up unsigned files
+        rm -f apk-output/*-aligned.apk
+        rm -f apk-output/app-debug.apk apk-output/app-release-unsigned.apk
+        ls -la apk-output/
+
+    - name: Upload Signed APK
       uses: actions/upload-artifact@v4
       with:
-        name: hearboost-apk
-        path: apk-output/*.apk
+        name: hearboost-signed-apk
+        path: apk-output/*-signed.apk
         retention-days: 90
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
       with:
         tag_name: v1.0.0
-        name: "HearBoost v1.0.0"
+        name: "HearBoost v1.0.0 - Signed APK"
         body: |
-          ## HearBoost v1.0.0 - Android Hearing Assistant
+          ## HearBoost v1.0.0
+          
           ### How to Install
-          1. Download the APK below
-          2. Enable Install from Unknown Sources
-          3. Open APK to install
-          4. Grant Microphone permission
-          5. Plug in headphones and tap Start Listening
+          1. Download the SIGNED APK below
+          2. Go to Settings > Security > Enable "Unknown Sources"
+          3. Open the downloaded APK file
+          4. Tap "Install"
+          5. Grant Microphone permission when asked
+          6. Plug in headphones and tap "Start Listening"
+          
+          ### Features
+          - One-tap audio amplification
+          - Noise reduction (3 levels)
+          - Bluetooth + Wired headphone support
+          - Senior-friendly dark UI
+          - Battery efficient (8+ hours)
           
           ### Requirements
           - Android 8.0+ (API 26)
-          - Wired or Bluetooth headphones
-        files: apk-output/*.apk
+          - Wired or Bluetooth headphones recommended
+        files: apk-output/*-signed.apk
         draft: false
         prerelease: false
       env:
