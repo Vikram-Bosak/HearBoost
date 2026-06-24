@@ -1,0 +1,91 @@
+name: Build APK & Create Release
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: gradle
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew || true
+
+    - name: Generate Gradle Wrapper
+      run: |
+        gradle wrapper --gradle-version 8.5
+
+    - name: Build Debug APK
+      run: ./gradlew assembleDebug --no-daemon
+
+    - name: Build Release APK
+      run: ./gradlew assembleRelease --no-daemon
+      continue-on-error: true
+
+    - name: Find APK files
+      run: |
+        echo "=== APK Files ==="
+        find . -name "*.apk" -type f
+        mkdir -p apk-output
+        find . -name "*.apk" -type f -exec cp {} apk-output/ \;
+
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: hearboost-apk
+        path: apk-output/*.apk
+        retention-days: 90
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: v1.0.0
+        name: "HearBoost v1.0.0"
+        body: |
+          ## 🎧 HearBoost v1.0.0
+          
+          **Android Hearing Assistant — Hear Every Word, Clearly**
+          
+          ### What's Included
+          - ✅ One-Tap Start Listening
+          - ✅ Real-time Mic → DSP → Headphones pipeline
+          - ✅ Volume Amplification (up to 20x)
+          - ✅ 3-Level Noise Reduction
+          - ✅ Wired + Bluetooth headphone support
+          - ✅ Foreground Service (background audio)
+          - ✅ Senior-Friendly Deep Ocean UI
+          - ✅ WHO hearing safety limits
+          
+          ### How to Install
+          1. Download the APK below
+          2. Enable "Install from Unknown Sources" on your Android phone
+          3. Open the APK file to install
+          4. Grant Microphone permission when asked
+          5. Plug in headphones and tap "Start Listening"!
+          
+          ### Requirements
+          - Android 8.0 (API 26) or higher
+          - Wired headphones OR Bluetooth headphones recommended
+          
+          ### ⚠️ Legal
+          This is a Sound Amplifier, NOT a medical hearing aid.
+        files: apk-output/*.apk
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
