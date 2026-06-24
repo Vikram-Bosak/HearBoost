@@ -2,6 +2,7 @@ package com.hearboost.ui.screens
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -145,7 +146,7 @@ fun AudioSettingsScreen(
                         viewModel.setNoiseReductionLevel(1)
                     },
                     modifier = Modifier.fillMaxWidth().height(56.dp),
-                    shape = MaterialTheme.shapes.full,
+                    shape = CircleShape,
                     border = BorderStroke(2.dp, Outline)
                 ) {
                     Text("Reset to Defaults", style = ButtonText, color = OnSurface)
@@ -168,7 +169,7 @@ private fun SectionLabel(text: String) {
 
 @Composable
 private fun DottedDivider() {
-    HorizontalDivider(
+    Divider(
         color = ActiveBorder,
         thickness = 1.dp,
         modifier = Modifier.padding(vertical = 4.dp)

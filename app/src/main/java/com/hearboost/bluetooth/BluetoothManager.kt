@@ -69,8 +69,7 @@ class HeadphoneManager @Inject constructor(
     fun startListening() {
         // Register for audio device changes
         val audioFilter = IntentFilter().apply {
-            addAction(AudioManager.ACTION_HEADSET_PLUG_IN)
-            addAction(AudioManager.ACTION_HEADSET_PLUG_OUT)
+            addAction(AudioManager.ACTION_HEADSET_PLUG)
             addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
         }
         context.registerReceiver(audioDeviceReceiver, audioFilter)
@@ -157,6 +156,7 @@ class HeadphoneManager @Inject constructor(
 
         val a2dp = bluetoothAdapter?.getProfileProxy(context, null, BluetoothProfile.A2DP)
         Thread.sleep(100) // Brief wait for profile connection
+        @Suppress("DEPRECATION")
         val devices = bluetoothAdapter?.getConnectedDevices(BluetoothProfile.A2DP)
         return devices?.firstOrNull()?.name ?: "Bluetooth Device"
     }

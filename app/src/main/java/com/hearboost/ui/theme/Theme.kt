@@ -33,11 +33,6 @@ private val HearBoostColorScheme = darkColorScheme(
     inverseOnSurface = InverseOnSurface,
     inversePrimary = InversePrimary,
     surfaceTint = SurfaceTint,
-    surfaceContainerLowest = SurfaceContainerLowest,
-    surfaceContainerLow = SurfaceContainerLow,
-    surfaceContainer = SurfaceContainer,
-    surfaceContainerHigh = SurfaceContainerHigh,
-    surfaceContainerHighest = SurfaceContainerHighest,
 )
 
 @Composable

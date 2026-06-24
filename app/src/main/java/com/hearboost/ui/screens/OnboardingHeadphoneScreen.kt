@@ -179,7 +179,7 @@ fun OnboardingHeadphoneScreen(
             Button(
                 onClick = onContinue,
                 modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = MaterialTheme.shapes.full,
+                shape = CircleShape,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = PrimaryContainer,
                     contentColor = OnPrimaryContainer

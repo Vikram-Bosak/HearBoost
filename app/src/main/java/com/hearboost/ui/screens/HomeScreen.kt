@@ -12,7 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
@@ -112,7 +112,7 @@ private fun TopAppBar(
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             // Battery pill
             Surface(
-                shape = MaterialTheme.shapes.full,
+                shape = CircleShape,
                 color = SurfaceContainer,
                 border = BorderStroke(1.dp, OutlineVariant)
             ) {
@@ -390,7 +390,7 @@ private fun ActiveListeningContent(
                 modifier = Modifier
                     .weight(1f)
                     .height(56.dp),
-                shape = MaterialTheme.shapes.full,
+                shape = CircleShape,
                 border = BorderStroke(1.dp, OutlineVariant),
                 colors = ButtonDefaults.outlinedButtonColors(containerColor = SurfaceContainerHigh)
             ) {
@@ -404,7 +404,7 @@ private fun ActiveListeningContent(
                 modifier = Modifier
                     .weight(1f)
                     .height(56.dp),
-                shape = MaterialTheme.shapes.full,
+                shape = CircleShape,
                 border = BorderStroke(1.dp, OutlineVariant),
                 colors = ButtonDefaults.outlinedButtonColors(containerColor = SurfaceContainerHigh)
             ) {
@@ -549,7 +549,7 @@ private fun ProfileQuickCard(
 
             Surface(
                 onClick = onSwitch,
-                shape = MaterialTheme.shapes.full,
+                shape = CircleShape,
                 color = PrimaryContainer.copy(alpha = 0.1f),
                 border = BorderStroke(1.dp, PrimaryContainer.copy(alpha = 0.2f))
             ) {

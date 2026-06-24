@@ -126,7 +126,7 @@ fun SplashScreen(onFinished: () -> Unit) {
                 .fillMaxWidth(0.8f)
         ) {
             LinearProgressIndicator(
-                progress = { progress },
+                progress = progress,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(4.dp),
