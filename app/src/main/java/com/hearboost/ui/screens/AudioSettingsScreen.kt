@@ -12,7 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hearboost.ui.theme.*
 import com.hearboost.viewmodel.HomeViewModel
 
@@ -166,7 +168,7 @@ private fun SectionLabel(text: String) {
 
 @Composable
 private fun DottedDivider() {
-    Divider(
+    HorizontalDivider(
         color = ActiveBorder,
         thickness = 1.dp,
         modifier = Modifier.padding(vertical = 4.dp)
@@ -253,4 +255,4 @@ private fun SegmentedControl(
     }
 }
 
-private val Float.Companion.sp get() = this
+

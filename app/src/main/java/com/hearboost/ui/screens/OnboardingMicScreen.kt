@@ -1,6 +1,9 @@
 package com.hearboost.ui.screens
 
 import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,20 +16,32 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
+import androidx.core.content.ContextCompat
 import com.hearboost.ui.theme.*
 
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun OnboardingMicScreen(
     onAllow: () -> Unit,
     onSkip: () -> Unit
 ) {
-    val micPermission = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
+    val context = LocalContext.current
+    var hasPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.RECORD_AUDIO
+            ) == PackageManager.PERMISSION_GRANTED
+        )
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        hasPermission = granted
+    }
 
     // Pulse animation
     val infiniteTransition = rememberInfiniteTransition(label = "mic")
@@ -40,8 +55,8 @@ fun OnboardingMicScreen(
         label = "pulse"
     )
 
-    LaunchedEffect(micPermission.status.isGranted) {
-        if (micPermission.status.isGranted) onAllow()
+    LaunchedEffect(hasPermission) {
+        if (hasPermission) onAllow()
     }
 
     Box(
@@ -145,7 +160,7 @@ fun OnboardingMicScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Button(
-                onClick = { micPermission.launchPermissionRequest() },
+                onClick = { permissionLauncher.launch(Manifest.permission.RECORD_AUDIO) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),

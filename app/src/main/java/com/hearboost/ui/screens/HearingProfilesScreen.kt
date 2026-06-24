@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.hearboost.ui.theme.*
 
 data class HearingProfile(
@@ -119,7 +120,7 @@ fun HearingProfilesScreen(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
                     color = SurfaceContainerHigh,
-                    border = BorderStroke(2.dp, OutlineVariant.copy(alpha = 0.5f).copy(style = Stroke.Dashed)),
+                    border = BorderStroke(2.dp, OutlineVariant.copy(alpha = 0.5f)),
                     onClick = { }
                 ) {
                     Row(
@@ -222,4 +223,4 @@ private fun ProfileListCard(profile: HearingProfile) {
     }
 }
 
-private val Float.Companion.sp get() = this
+
