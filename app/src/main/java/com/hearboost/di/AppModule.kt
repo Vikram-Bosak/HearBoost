@@ -4,7 +4,6 @@ import android.content.Context
 import com.hearboost.audio.AudioEngine
 import com.hearboost.audio.NoiseReductionEngine
 import com.hearboost.audio.VolumeBooster
-import com.hearboost.bluetooth.HeadphoneManager
 import com.hearboost.settings.SettingsManager
 import dagger.Module
 import dagger.Provides
@@ -29,11 +28,8 @@ object AppModule {
     @Singleton
     fun provideNoiseReductionEngine(): NoiseReductionEngine = NoiseReductionEngine()
 
-    @Provides
-    @Singleton
-    fun provideHeadphoneManager(
-        @ApplicationContext context: Context
-    ): HeadphoneManager = HeadphoneManager(context)
+    // HeadphoneManager already has @Inject constructor — Hilt auto-provides it!
+    // Don't add manual @Provides here or it causes duplicate binding
 
     @Provides
     @Singleton
