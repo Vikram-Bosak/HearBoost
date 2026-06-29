@@ -52,7 +52,7 @@ class AudioForegroundService : Service() {
         when (intent?.action) {
             ACTION_START -> {
                 startForegroundNotification()
-                audioEngine.start()
+                audioEngine.start(this)
             }
             ACTION_STOP -> {
                 audioEngine.stop()

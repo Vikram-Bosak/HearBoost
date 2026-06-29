@@ -1,6 +1,8 @@
 package com.hearboost.audio
 
+import android.media.AudioDeviceInfo
 import android.media.AudioFormat
+import android.media.AudioManager
 import android.media.AudioRecord
 import android.media.AudioTrack
 import android.media.MediaRecorder
@@ -10,19 +12,19 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Core audio engine: manages the full pipeline from mic → processing → headphones.
- * Uses AudioRecord for capture and AudioTrack for playback with minimum latency settings.
+ * Core audio engine: manages mic → processing → headphones pipeline.
+ * Uses VOICE_COMMUNICATION source when headphones are connected for echo-free audio.
  */
 @Singleton
 class AudioEngine @Inject constructor() {
 
     companion object {
         private const val TAG = "AudioEngine"
-        const val SAMPLE_RATE = 48000
+        const val SAMPLE_RATE = 44100
         const val CHANNEL_IN = AudioFormat.CHANNEL_IN_MONO
         const val CHANNEL_OUT = AudioFormat.CHANNEL_OUT_MONO
         const val AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT
-        const val MAX_AMP_FACTOR = 20.0f // Maximum amplification factor
+        const val MAX_AMP_FACTOR = 20.0f
     }
 
     private var audioRecord: AudioRecord? = null
@@ -33,34 +35,55 @@ class AudioEngine @Inject constructor() {
     var isRunning = false
         private set
 
-    // Processing parameters (can be adjusted at runtime)
     var gainFactor: Float = 3.0f
     var noiseReductionEnabled: Boolean = true
-    var noiseReductionLevel: Int = 1 // 0=off, 1=low, 2=high
-
-    // Callback for audio level metering (UI waveform visualization)
+    var noiseReductionLevel: Int = 1
     var onAudioLevel: ((Float) -> Unit)? = null
 
-    // Calculate optimal buffer size
     private fun calculateBufferSize(): Int {
         val minBuf = AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL_IN, AUDIO_FORMAT)
-        return maxOf(minBuf, SAMPLE_RATE / 25) // ~40ms buffer for low latency
+        return maxOf(minBuf, SAMPLE_RATE / 25)
     }
 
-    fun start(): Boolean {
+    private fun isHeadphoneConnected(context: android.content.Context): Boolean {
+        val audioManager = context.getSystemService(android.content.Context.AUDIO_SERVICE) as AudioManager
+        val devices = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
+        return devices.any {
+            it.type == AudioDeviceInfo.TYPE_WIRED_HEADSET ||
+            it.type == AudioDeviceInfo.TYPE_WIRED_HEADPHONES ||
+            it.type == AudioDeviceInfo.TYPE_USB_HEADSET ||
+            it.type == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP ||
+            it.type == AudioDeviceInfo.TYPE_BLUETOOTH_SCO
+        }
+    }
+
+    fun start(context: android.content.Context? = null): Boolean {
         if (isRunning) return true
 
         return try {
             val bufferSize = calculateBufferSize()
             Log.d(TAG, "Buffer size: $bufferSize bytes")
 
-            // Initialize AudioRecord
+            val headphoneConnected = context?.let { isHeadphoneConnected(it) } ?: false
+            Log.d(TAG, "Headphone connected: $headphoneConnected")
+
+            // KEY FIX: When headphones connected, use VOICE_COMMUNICATION
+            // This routes to headphone mic AND enables Android's built-in echo cancellation
+            // When no headphones, use MIC for best phone mic quality
+            val audioSource = if (headphoneConnected) {
+                MediaRecorder.AudioSource.VOICE_COMMUNICATION
+            } else {
+                MediaRecorder.AudioSource.MIC
+            }
+
+            Log.d(TAG, "Audio source: $audioSource (headphone=$headphoneConnected)")
+
             audioRecord = AudioRecord(
-                MediaRecorder.AudioSource.MIC,
+                audioSource,
                 SAMPLE_RATE,
                 CHANNEL_IN,
                 AUDIO_FORMAT,
-                bufferSize * 2 // Double buffer for safety
+                bufferSize * 2
             ).also {
                 if (it.state != AudioRecord.STATE_INITIALIZED) {
                     Log.e(TAG, "AudioRecord failed to initialize")
@@ -68,7 +91,6 @@ class AudioEngine @Inject constructor() {
                 }
             }
 
-            // Initialize AudioTrack for direct output
             val trackBufferSize = AudioTrack.getMinBufferSize(
                 SAMPLE_RATE, CHANNEL_OUT, AUDIO_FORMAT
             )
@@ -88,16 +110,13 @@ class AudioEngine @Inject constructor() {
             audioRecord?.startRecording()
             audioTrack?.play()
 
-            // Prime AudioTrack with silence to prevent clicking on start
-            val silenceBuffer = ShortArray(1024)
+            // Prime with silence to prevent click
+            val silenceBuffer = ShortArray(512)
             audioTrack?.write(silenceBuffer, 0, silenceBuffer.size)
 
             isRunning = true
+            Thread.sleep(30)
 
-            // Small delay to let audio devices settle
-            Thread.sleep(50)
-
-            // Start the processing loop
             processingJob = scope.launch { audioProcessingLoop(bufferSize) }
             Log.d(TAG, "AudioEngine started successfully")
             true
@@ -115,21 +134,10 @@ class AudioEngine @Inject constructor() {
         processingJob?.cancel()
         processingJob = null
 
-        try {
-            audioRecord?.apply {
-                stop()
-                release()
-            }
-        } catch (e: Exception) {
+        try { audioRecord?.apply { stop(); release() } } catch (e: Exception) {
             Log.e(TAG, "Error stopping AudioRecord", e)
         }
-
-        try {
-            audioTrack?.apply {
-                stop()
-                release()
-            }
-        } catch (e: Exception) {
+        try { audioTrack?.apply { stop(); release() } } catch (e: Exception) {
             Log.e(TAG, "Error stopping AudioTrack", e)
         }
 
@@ -138,84 +146,74 @@ class AudioEngine @Inject constructor() {
         Log.d(TAG, "AudioEngine stopped")
     }
 
-    /**
-     * Main audio processing loop — reads PCM from mic, applies DSP, writes to output.
-     */
     private suspend fun audioProcessingLoop(bufferSize: Int) = withContext(Dispatchers.Default) {
-        val buffer = ShortArray(bufferSize / 2) // 16-bit PCM = 2 bytes per sample
+        val buffer = ShortArray(bufferSize / 2)
         val noiseGateThreshold = if (noiseReductionEnabled) {
             when (noiseReductionLevel) {
-                2 -> 800  // High: aggressive gate
-                1 -> 400  // Low: moderate gate
-                else -> 0 // Off
+                2 -> 800
+                1 -> 400
+                else -> 0
             }
         } else 0
+
+        var fadeSamples = 0
+        val fadeLength = SAMPLE_RATE / 20
 
         while (isActive && isRunning) {
             val readCount = audioRecord?.read(buffer, 0, buffer.size) ?: 0
             if (readCount <= 0) continue
 
-            // === DSP Pipeline ===
+            // Fade-in
+            if (fadeSamples < fadeLength) {
+                for (i in 0 until readCount) {
+                    if (fadeSamples >= fadeLength) break
+                    val fadeFactor = fadeSamples.toFloat() / fadeLength
+                    buffer[i] = (buffer[i] * fadeFactor).toInt().toShort()
+                    fadeSamples++
+                }
+            }
+
             processAudioBuffer(
-                buffer,
-                readCount,
-                gainFactor,
-                noiseReductionEnabled,
-                noiseGateThreshold,
-                noiseReductionLevel
+                buffer, readCount, gainFactor,
+                noiseReductionEnabled, noiseGateThreshold
             )
 
-            // Write processed audio to output
             audioTrack?.write(buffer, 0, readCount)
 
-            // Calculate audio level for UI visualization
             val level = calculateAudioLevel(buffer, readCount)
             onAudioLevel?.invoke(level)
         }
     }
 
-    /**
-     * Process a single buffer: noise gate → amplification → soft clip.
-     */
     private fun processAudioBuffer(
-        buffer: ShortArray,
-        length: Int,
-        gain: Float,
-        reduceNoise: Boolean,
-        gateThreshold: Int,
-        level: Int
+        buffer: ShortArray, length: Int, gain: Float,
+        reduceNoise: Boolean, gateThreshold: Int
     ) {
         for (i in 0 until length) {
             var sample = buffer[i].toFloat()
 
-            // Step 1: Smooth Noise Gate (prevents clicking)
+            // Smooth noise gate
             if (reduceNoise && gateThreshold > 0) {
                 val absSample = kotlin.math.abs(sample.toInt())
                 if (absSample < gateThreshold) {
-                    // Smooth fade out instead of hard cut
-                    sample *= 0.3f
+                    sample *= 0.2f
                 } else {
-                    // Smooth transition above gate
                     val ratio = ((absSample - gateThreshold).toFloat() / (Short.MAX_VALUE - gateThreshold))
                         .coerceIn(0.3f, 1.0f)
                     sample *= ratio
                 }
             }
 
-            // Step 2: Gain Amplification (reduced default)
-            sample *= gain * 0.7f
+            // Gain — reduced to prevent feedback
+            sample *= gain * 0.6f
 
-            // Step 3: Soft Clipping (prevents harsh distortion)
+            // Soft clip
             sample = softClip(sample)
 
             buffer[i] = sample.toInt().coerceIn(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt()).toShort()
         }
     }
 
-    /**
-     * Soft clipping function — smooth saturation curve instead of hard digital clip.
-     * Preserves natural sound at high gains.
-     */
     private fun softClip(sample: Float): Float {
         val maxVal = Short.MAX_VALUE.toFloat()
         val normalized = sample / maxVal
@@ -223,9 +221,6 @@ class AudioEngine @Inject constructor() {
         return clipped * maxVal
     }
 
-    /**
-     * Calculate RMS audio level normalized to 0.0..1.0 for UI metering.
-     */
     private fun calculateAudioLevel(buffer: ShortArray, length: Int): Float {
         var sum = 0.0
         for (i in 0 until length) {
