@@ -87,7 +87,15 @@ class AudioEngine @Inject constructor() {
 
             audioRecord?.startRecording()
             audioTrack?.play()
+
+            // Prime AudioTrack with silence to prevent clicking on start
+            val silenceBuffer = ShortArray(1024)
+            audioTrack?.write(silenceBuffer, 0, silenceBuffer.size)
+
             isRunning = true
+
+            // Small delay to let audio devices settle
+            Thread.sleep(50)
 
             // Start the processing loop
             processingJob = scope.launch { audioProcessingLoop(bufferSize) }

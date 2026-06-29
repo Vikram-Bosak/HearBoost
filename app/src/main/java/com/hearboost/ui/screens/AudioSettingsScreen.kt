@@ -169,7 +169,7 @@ private fun SectionLabel(text: String) {
 
 @Composable
 private fun DottedDivider() {
-    HorizontalDivider(
+    Divider(
         color = ActiveBorder,
         thickness = 1.dp,
         modifier = Modifier.padding(vertical = 4.dp)
