@@ -37,7 +37,7 @@ fun HomeScreen(
     Box(modifier = Modifier.fillMaxSize().background(Background)) {
         Column(modifier = Modifier.fillMaxSize()) {
             // Top App Bar
-            TopAppBar(
+            HomeTopAppBar(
                 headphoneConnected = state.headphoneConnected,
                 headphoneName = state.headphoneName,
                 batteryPercent = state.batteryPercent,
@@ -87,7 +87,7 @@ fun HomeScreen(
 }
 
 @Composable
-private fun TopAppBar(
+private fun HomeTopAppBar(
     headphoneConnected: Boolean,
     headphoneName: String,
     batteryPercent: Int,
