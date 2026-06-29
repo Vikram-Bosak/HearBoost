@@ -28,8 +28,10 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
-    - name: Make gradlew executable
-      run: chmod +x gradlew
+    - name: Generate Gradle Wrapper
+      run: |
+        chmod +x gradlew 2>/dev/null || true
+        gradle wrapper --gradle-version 8.5
 
     - name: Build Debug APK
       run: ./gradlew assembleDebug --no-daemon
@@ -45,34 +47,48 @@ jobs:
         ls -la apk-output/
 
     - name: Sign APK
+      env:
+        KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
       run: |
+        # Create keystore
         keytool -genkeypair -v \
           -keystore release.keystore \
-          -alias hearboost \
+          -alias ${KEY_ALIAS:-hearboost} \
           -keyalg RSA -keysize 2048 \
           -validity 10000 \
-          -storepass ${{ secrets.KEYSTORE_PASSWORD }} \
-          -keypass ${{ secrets.KEY_PASSWORD }} \
+          -storepass ${KEYSTORE_PASSWORD} \
+          -keypass ${KEY_PASSWORD} \
           -dname "CN=HearBoost, OU=Dev, O=HearBoost, L=India, ST=Bihar, C=IN"
 
+        # Find apksigner
         APKSIGNER=$(find $ANDROID_HOME -name "apksigner" -type f | head -1)
         ZIPALIGN=$(find $ANDROID_HOME -name "zipalign" -type f | head -1)
 
+        # Sign each APK
         for apk in apk-output/*.apk; do
           echo "Signing $apk..."
           BASENAME=$(basename "$apk" .apk)
+          
+          # Zipalign
           ${ZIPALIGN} -v -p 4 "$apk" "apk-output/${BASENAME}-aligned.apk" 2>/dev/null || cp "$apk" "apk-output/${BASENAME}-aligned.apk"
+          
+          # Sign
           ${APKSIGNER} sign \
             --ks release.keystore \
-            --ks-pass pass:${{ secrets.KEYSTORE_PASSWORD }} \
-            --key-pass pass:${{ secrets.KEY_PASSWORD }} \
-            --ks-key-alias hearboost \
+            --ks-pass pass:${KEYSTORE_PASSWORD} \
+            --key-pass pass:${KEY_PASSWORD} \
+            --ks-key-alias ${KEY_ALIAS:-hearboost} \
             --out "apk-output/${BASENAME}-signed.apk" \
             "apk-output/${BASENAME}-aligned.apk"
+          
+          # Verify
           ${APKSIGNER} verify --verbose "apk-output/${BASENAME}-signed.apk"
           echo "Done: ${BASENAME}-signed.apk"
         done
 
+        # Clean up unsigned files
         rm -f apk-output/*-aligned.apk
         rm -f apk-output/app-debug.apk apk-output/app-release-unsigned.apk
         ls -la apk-output/
