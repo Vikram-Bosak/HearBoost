@@ -12,8 +12,11 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Core audio engine: manages mic → processing → headphones pipeline.
- * Uses VOICE_COMMUNICATION source when headphones are connected for echo-free audio.
+ * Audio engine with dual mic support.
+ * Strategy:
+ * 1. Use MIC source (captures from both phone + headphone on many devices)
+ * 2. If headphone detected, also try secondary mic capture
+ * 3. Mix both streams for complete audio coverage
  */
 @Singleton
 class AudioEngine @Inject constructor() {
@@ -27,7 +30,10 @@ class AudioEngine @Inject constructor() {
         const val MAX_AMP_FACTOR = 20.0f
     }
 
+    // Primary audio capture
     private var audioRecord: AudioRecord? = null
+    // Secondary mic (phone mic when headphone is connected)
+    private var secondaryAudioRecord: AudioRecord? = null
     private var audioTrack: AudioTrack? = null
     private var processingJob: Job? = null
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
@@ -39,6 +45,8 @@ class AudioEngine @Inject constructor() {
     var noiseReductionEnabled: Boolean = true
     var noiseReductionLevel: Int = 1
     var onAudioLevel: ((Float) -> Unit)? = null
+
+    private var headphoneConnected = false
 
     private fun calculateBufferSize(): Int {
         val minBuf = AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL_IN, AUDIO_FORMAT)
@@ -62,35 +70,50 @@ class AudioEngine @Inject constructor() {
 
         return try {
             val bufferSize = calculateBufferSize()
-            Log.d(TAG, "Buffer size: $bufferSize bytes")
-
-            val headphoneConnected = context?.let { isHeadphoneConnected(it) } ?: false
+            headphoneConnected = context?.let { isHeadphoneConnected(it) } ?: false
             Log.d(TAG, "Headphone connected: $headphoneConnected")
 
-            // KEY FIX: When headphones connected, use VOICE_COMMUNICATION
-            // This routes to headphone mic AND enables Android's built-in echo cancellation
-            // When no headphones, use MIC for best phone mic quality
-            val audioSource = if (headphoneConnected) {
-                MediaRecorder.AudioSource.VOICE_COMMUNICATION
-            } else {
-                MediaRecorder.AudioSource.MIC
-            }
-
-            Log.d(TAG, "Audio source: $audioSource (headphone=$headphoneConnected)")
-
+            // PRIMARY: Always use MIC source
+            // On many devices, MIC source captures from BOTH phone + headphone mics
+            Log.d(TAG, "Using MIC source (dual mic strategy)")
             audioRecord = AudioRecord(
-                audioSource,
+                MediaRecorder.AudioSource.MIC,
                 SAMPLE_RATE,
                 CHANNEL_IN,
                 AUDIO_FORMAT,
                 bufferSize * 2
             ).also {
                 if (it.state != AudioRecord.STATE_INITIALIZED) {
-                    Log.e(TAG, "AudioRecord failed to initialize")
+                    Log.e(TAG, "Primary AudioRecord failed")
                     return false
                 }
             }
 
+            // SECONDARY: If headphone connected, try to open phone mic separately
+            // This captures ambient sound that headphone mic misses
+            if (headphoneConnected) {
+                try {
+                    secondaryAudioRecord = AudioRecord(
+                        MediaRecorder.AudioSource.CAMCORDER,
+                        SAMPLE_RATE,
+                        CHANNEL_IN,
+                        AUDIO_FORMAT,
+                        bufferSize * 2
+                    )
+                    if (secondaryAudioRecord?.state != AudioRecord.STATE_INITIALIZED) {
+                        Log.w(TAG, "Secondary AudioRecord failed - using primary only")
+                        secondaryAudioRecord?.release()
+                        secondaryAudioRecord = null
+                    } else {
+                        Log.d(TAG, "Secondary mic (phone) opened successfully")
+                    }
+                } catch (e: Exception) {
+                    Log.w(TAG, "Could not open secondary mic: ${e.message}")
+                    secondaryAudioRecord = null
+                }
+            }
+
+            // AudioTrack for output
             val trackBufferSize = AudioTrack.getMinBufferSize(
                 SAMPLE_RATE, CHANNEL_OUT, AUDIO_FORMAT
             )
@@ -107,10 +130,12 @@ class AudioEngine @Inject constructor() {
                 .setPerformanceMode(AudioTrack.PERFORMANCE_MODE_LOW_LATENCY)
                 .build()
 
+            // Start all audio streams
             audioRecord?.startRecording()
+            secondaryAudioRecord?.startRecording()
             audioTrack?.play()
 
-            // Prime with silence to prevent click
+            // Prime with silence
             val silenceBuffer = ShortArray(512)
             audioTrack?.write(silenceBuffer, 0, silenceBuffer.size)
 
@@ -118,7 +143,7 @@ class AudioEngine @Inject constructor() {
             Thread.sleep(30)
 
             processingJob = scope.launch { audioProcessingLoop(bufferSize) }
-            Log.d(TAG, "AudioEngine started successfully")
+            Log.d(TAG, "AudioEngine started - dual mic: ${secondaryAudioRecord != null}")
             true
         } catch (e: SecurityException) {
             Log.e(TAG, "Missing RECORD_AUDIO permission", e)
@@ -137,17 +162,24 @@ class AudioEngine @Inject constructor() {
         try { audioRecord?.apply { stop(); release() } } catch (e: Exception) {
             Log.e(TAG, "Error stopping AudioRecord", e)
         }
+        try { secondaryAudioRecord?.apply { stop(); release() } } catch (e: Exception) {
+            Log.e(TAG, "Error stopping secondary AudioRecord", e)
+        }
         try { audioTrack?.apply { stop(); release() } } catch (e: Exception) {
             Log.e(TAG, "Error stopping AudioTrack", e)
         }
 
         audioRecord = null
+        secondaryAudioRecord = null
         audioTrack = null
         Log.d(TAG, "AudioEngine stopped")
     }
 
     private suspend fun audioProcessingLoop(bufferSize: Int) = withContext(Dispatchers.Default) {
         val buffer = ShortArray(bufferSize / 2)
+        val secondaryBuffer = ShortArray(bufferSize / 2)
+        val mixedBuffer = ShortArray(bufferSize / 2)
+
         val noiseGateThreshold = if (noiseReductionEnabled) {
             when (noiseReductionLevel) {
                 2 -> 800
@@ -160,8 +192,27 @@ class AudioEngine @Inject constructor() {
         val fadeLength = SAMPLE_RATE / 20
 
         while (isActive && isRunning) {
+            // Read from primary mic
             val readCount = audioRecord?.read(buffer, 0, buffer.size) ?: 0
             if (readCount <= 0) continue
+
+            // Read from secondary mic (phone mic) if available
+            val hasSecondary = secondaryAudioRecord != null
+            if (hasSecondary) {
+                val secondaryRead = secondaryAudioRecord?.read(secondaryBuffer, 0, secondaryBuffer.size) ?: 0
+
+                // Mix both audio streams
+                // Primary (headphone) gets 60%, Secondary (phone) gets 40%
+                for (i in 0 until readCount) {
+                    val primary = buffer[i].toFloat() * 0.6f
+                    val secondary = if (i < secondaryRead) secondaryBuffer[i].toFloat() * 0.4f else 0f
+                    mixedBuffer[i] = (primary + secondary).toInt()
+                        .coerceIn(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt())
+                        .toShort()
+                }
+                // Copy mixed back to buffer
+                System.arraycopy(mixedBuffer, 0, buffer, 0, readCount)
+            }
 
             // Fade-in
             if (fadeSamples < fadeLength) {
@@ -173,13 +224,16 @@ class AudioEngine @Inject constructor() {
                 }
             }
 
+            // Process audio
             processAudioBuffer(
                 buffer, readCount, gainFactor,
                 noiseReductionEnabled, noiseGateThreshold
             )
 
+            // Output
             audioTrack?.write(buffer, 0, readCount)
 
+            // UI level
             val level = calculateAudioLevel(buffer, readCount)
             onAudioLevel?.invoke(level)
         }
@@ -192,7 +246,7 @@ class AudioEngine @Inject constructor() {
         for (i in 0 until length) {
             var sample = buffer[i].toFloat()
 
-            // Smooth noise gate
+            // Noise gate
             if (reduceNoise && gateThreshold > 0) {
                 val absSample = kotlin.math.abs(sample.toInt())
                 if (absSample < gateThreshold) {
@@ -204,7 +258,7 @@ class AudioEngine @Inject constructor() {
                 }
             }
 
-            // Gain — reduced to prevent feedback
+            // Gain
             sample *= gain * 0.6f
 
             // Soft clip

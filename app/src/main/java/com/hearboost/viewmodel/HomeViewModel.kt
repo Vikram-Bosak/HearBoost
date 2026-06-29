@@ -1,7 +1,10 @@
 package com.hearboost.viewmodel
 
 import android.app.Application
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
+import android.os.BatteryManager
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.hearboost.audio.AudioEngine
@@ -11,6 +14,7 @@ import com.hearboost.bluetooth.HeadphoneManager
 import com.hearboost.service.AudioForegroundService
 import com.hearboost.settings.SettingsManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,7 +29,6 @@ class HomeViewModel @Inject constructor(
     private val settingsManager: SettingsManager
 ) : AndroidViewModel(application) {
 
-    // UI State
     data class UiState(
         val isListening: Boolean = false,
         val volumePercent: Int = 70,
@@ -34,7 +37,7 @@ class HomeViewModel @Inject constructor(
         val headphoneConnected: Boolean = false,
         val headphoneName: String = "Not connected",
         val headphoneType: HeadphoneManager.HeadphoneType = HeadphoneManager.HeadphoneType.NONE,
-        val batteryPercent: Int = 80,
+        val batteryPercent: Int = 0,
         val audioLevel: Float = 0f,
         val isFullScreenMode: Boolean = false,
         val activeProfile: String = "Default"
@@ -44,9 +47,11 @@ class HomeViewModel @Inject constructor(
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
     init {
+        // Read real battery level
+        updateBatteryLevel()
+
         // Start observing headphone changes
         headphoneManager.startListening()
-
         viewModelScope.launch {
             headphoneManager.headphoneState.collect { state ->
                 _uiState.update {
@@ -74,23 +79,50 @@ class HomeViewModel @Inject constructor(
             }
         }
 
-        // Audio level callback for waveform visualization
+        // Audio level callback for waveform — runs continuously
         audioEngine.onAudioLevel = { level ->
             _uiState.update { it.copy(audioLevel = level) }
+        }
+
+        // Battery update loop — check every 30 seconds
+        viewModelScope.launch {
+            while (true) {
+                updateBatteryLevel()
+                delay(30000)
+            }
+        }
+    }
+
+    private fun updateBatteryLevel() {
+        try {
+            val app = getApplication<Application>()
+            val batteryIntent = app.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+            val level = batteryIntent?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
+            val scale = batteryIntent?.getIntExtra(BatteryManager.EXTRA_SCALE, -1) ?: -1
+            if (level >= 0 && scale > 0) {
+                val batteryPct = (level * 100 / scale.toFloat()).toInt()
+                _uiState.update { it.copy(batteryPercent = batteryPct) }
+            }
+        } catch (e: Exception) {
+            _uiState.update { it.copy(batteryPercent = 50) }
         }
     }
 
     fun toggleListening() {
         val app = getApplication<Application>()
+
+        // Re-register audio level callback before starting
+        audioEngine.onAudioLevel = { level ->
+            _uiState.update { it.copy(audioLevel = level) }
+        }
+
         if (_uiState.value.isListening) {
-            // Stop
             val intent = Intent(app, AudioForegroundService::class.java).apply {
                 action = AudioForegroundService.ACTION_STOP
             }
             app.startForegroundService(intent)
             _uiState.update { it.copy(isListening = false, audioLevel = 0f) }
         } else {
-            // Start
             audioEngine.setGain(volumeBooster.gain)
             audioEngine.setNoiseReduction(
                 noiseEngine.isEnabled(),
@@ -108,11 +140,7 @@ class HomeViewModel @Inject constructor(
         _uiState.update { it.copy(volumePercent = percent) }
         volumeBooster.setVolumePercent(percent)
         audioEngine.setGain(volumeBooster.gain)
-
-        // Update service
         updateServiceSettings()
-
-        // Persist
         viewModelScope.launch { settingsManager.updateVolume(percent) }
     }
 
