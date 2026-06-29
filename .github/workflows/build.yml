@@ -47,15 +47,19 @@ jobs:
         ls -la apk-output/
 
     - name: Sign APK
+      env:
+        KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
       run: |
         # Create keystore
         keytool -genkeypair -v \
           -keystore release.keystore \
-          -alias hearboost \
+          -alias ${KEY_ALIAS:-hearboost} \
           -keyalg RSA -keysize 2048 \
           -validity 10000 \
-          -storepass hearboost123 \
-          -keypass hearboost123 \
+          -storepass ${KEYSTORE_PASSWORD} \
+          -keypass ${KEY_PASSWORD} \
           -dname "CN=HearBoost, OU=Dev, O=HearBoost, L=India, ST=Bihar, C=IN"
 
         # Find apksigner
@@ -73,9 +77,9 @@ jobs:
           # Sign
           ${APKSIGNER} sign \
             --ks release.keystore \
-            --ks-pass pass:hearboost123 \
-            --key-pass pass:hearboost123 \
-            --ks-key-alias hearboost \
+            --ks-pass pass:${KEYSTORE_PASSWORD} \
+            --key-pass pass:${KEY_PASSWORD} \
+            --ks-key-alias ${KEY_ALIAS:-hearboost} \
             --out "apk-output/${BASENAME}-signed.apk" \
             "apk-output/${BASENAME}-aligned.apk"
           
