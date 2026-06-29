@@ -81,7 +81,8 @@ class NoiseReductionEngine @Inject constructor() {
         for (i in 0 until length) {
             val absSample = kotlin.math.abs(buffer[i].toInt())
             if (absSample < threshold) {
-                buffer[i] = (buffer[i] * attenuation).toInt().toShort()
+                // Smooth attenuation instead of hard cut
+                buffer[i] = (buffer[i] * 0.4f).toInt().toShort()
             }
         }
     }

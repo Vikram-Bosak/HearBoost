@@ -180,21 +180,22 @@ class AudioEngine @Inject constructor() {
         for (i in 0 until length) {
             var sample = buffer[i].toFloat()
 
-            // Step 1: Noise Gate (simple threshold-based)
+            // Step 1: Smooth Noise Gate (prevents clicking)
             if (reduceNoise && gateThreshold > 0) {
                 val absSample = kotlin.math.abs(sample.toInt())
                 if (absSample < gateThreshold) {
-                    sample *= 0.1f // Attenuate below threshold
+                    // Smooth fade out instead of hard cut
+                    sample *= 0.3f
                 } else {
                     // Smooth transition above gate
                     val ratio = ((absSample - gateThreshold).toFloat() / (Short.MAX_VALUE - gateThreshold))
-                        .coerceIn(0f, 1f)
+                        .coerceIn(0.3f, 1.0f)
                     sample *= ratio
                 }
             }
 
-            // Step 2: Gain Amplification
-            sample *= gain
+            // Step 2: Gain Amplification (reduced default)
+            sample *= gain * 0.7f
 
             // Step 3: Soft Clipping (prevents harsh distortion)
             sample = softClip(sample)

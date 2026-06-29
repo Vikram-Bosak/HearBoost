@@ -81,7 +81,9 @@ fun HomeScreen(
 
         // Bottom Navigation
         BottomNavBar(
-            modifier = Modifier.align(Alignment.BottomCenter)
+            modifier = Modifier.align(Alignment.BottomCenter),
+            onNavigateToProfiles = onNavigateToProfiles,
+            onNavigateToAudioSettings = onNavigateToAudioSettings
         )
     }
 }
@@ -604,7 +606,9 @@ private fun WaveformBars(
 
 @Composable
 private fun BottomNavBar(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onNavigateToProfiles: () -> Unit = {},
+    onNavigateToAudioSettings: () -> Unit = {}
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -629,19 +633,21 @@ private fun BottomNavBar(
                 Icon(Icons.Filled.GraphicEq, null, tint = OnPrimaryContainer, modifier = Modifier.size(24.dp))
                 Text("Listen", style = LabelMedium, color = OnPrimaryContainer)
             }
-
             // Profiles
             Column(
-                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+                modifier = Modifier
+                    .clickable { onNavigateToProfiles() }
+                    .padding(horizontal = 24.dp, vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Icon(Icons.Filled.AccountCircle, null, tint = OnSurfaceVariant, modifier = Modifier.size(24.dp))
                 Text("Profiles", style = LabelMedium, color = OnSurfaceVariant)
             }
-
             // History
             Column(
-                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+                modifier = Modifier
+                    .clickable { onNavigateToAudioSettings() }
+                    .padding(horizontal = 24.dp, vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Icon(Icons.Filled.History, null, tint = OnSurfaceVariant, modifier = Modifier.size(24.dp))
